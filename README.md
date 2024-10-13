@@ -8,7 +8,7 @@ python main.py -uj \<$UsnJrnl .db file path\> -df \<Defender folder path\> -o \<
 ### Options
 -uj: Path to the .db file extracted using [NTFS Log Tracker 1.71](https://sites.google.com/site/forensicnote/ntfs-log-tracker?pli=1)
 
--df: Path to the Windows Defender folder(\\ProgramData\\Microsoft\\Windows Defender\\), already extracted using a tool like [FTK Imager](https://www.exterro.com/ftk-product-downloads/ftk-imager-version-4-7-1)path. 
+-df: Path to the Windows Defender folder(_\\ProgramData\\Microsoft\\Windows Defender_), already extracted using a tool like [FTK Imager](https://www.exterro.com/ftk-product-downloads/ftk-imager-version-4-7-1)path. 
 
 -o: Path to the folder where results will be saved
 
