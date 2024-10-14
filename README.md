@@ -52,6 +52,9 @@ python C:\Tmp\MSDAD\main.py -uj "C:\Tmp\artifact\parsed_usnjrnl_using_log_tracke
     - N_RD_File: RD file name extracted and mapped to the suspected file
     - N_DH_File: DT file name used to extract the suspected file
 
+### Caution
+When extracting the .db file from the $UsnJrnl using NTFS Log Tracker, ensure that the section highlighted in red is set to UTC-0, as shown in the image below.
+![NTFS Log Tracker](https://github.com/user-attachments/assets/dfebe4a0-0e90-4b61-a5d8-676687a80bbd)
 
 
 # Test Environment
