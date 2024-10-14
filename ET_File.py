@@ -9,7 +9,7 @@ def parsing(path, out_path):
     
     ET_File_path = path + r"\Quarantine\Entries"
     et_dict = dict()
-    # print(path)
+
     uid_pattern = r'^\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}$'
     file_list = list()
     E_list = list()
@@ -24,7 +24,7 @@ def parsing(path, out_path):
                 et_header = f1.read(0x3C)
                 rc4 = mu.RC4Variant()
                 dec_et_header = rc4.process(et_header)
-                # print(dec_et_header)
+
                 et_section_1_len = struct.unpack('<I', dec_et_header[0x28:0x2C])[0]
                 et_section_2_len = struct.unpack('<I', dec_et_header[0x2C:0x30])[0]
                 et_section_1 = f1.read(et_section_1_len)
@@ -46,30 +46,15 @@ def parsing(path, out_path):
             section_1_crc = dec_et_header[48:52]
             section_2_crc = dec_et_header[52:56]
             magic_footer = dec_et_header[56:60]
-            # print()
-            # print(f"magic_header: {magic_header}")
-            # print(f"padding: {padding}")
-            # print(f"section_1_size: {section_1_size}")
-            # print(f"section_2_size: {section_2_size}")
-            # print(f"section_1_crc: {section_1_crc}")
-            # print(f"section_2_crc: {section_2_crc}")
-            # print(f"magic_footer: {magic_footer}")
+
             _id = dec_et_section_1[:16]
             scan_id = dec_et_section_1[16:32]
             timestamp = dec_et_section_1[32:40]
             threat_id = dec_et_section_1[40:48]
             one = dec_et_section_1[48:52]
             detection_name = dec_et_section_1[52:].decode().rstrip('\x00')
-            # print()
-            # print(f"_id: {_id}")
-            # print(f"scan_id: {scan_id}")
-            # print(f"timestamp: {timestamp}")
-            # print(f"threat_id: {threat_id}")
-            # print(f"one: {one}")
-            # print(f"detection_name: {detection_name}")
+            
             entry_count = struct.unpack("<I", dec_et_section_2[:4])[0]
-            # print()
-            # print(f"entry_count: {entry_count}")
             
             et_dict["section_1_crc"] = struct.unpack('<I', section_1_crc)[0]
             et_dict["section_2_crc"] = struct.unpack('<I', section_2_crc)[0]
@@ -81,7 +66,6 @@ def parsing(path, out_path):
             entry_offsets = list()
             for i in range(entry_count):
                 entry_offsets.append(struct.unpack("<I", dec_et_section_2[(i*4)+4:(i*4)+8])[0])
-            # print(f"entry_offsets: {entry_offsets}")
             
             et_resource_dict_1 = dict()
             et_resource_dict_2 = dict()
@@ -93,43 +77,35 @@ def parsing(path, out_path):
                     et_resource = dec_et_section_2[entry_offsets[i]:]
                 else:
                     et_resource = dec_et_section_2[entry_offsets[i]:entry_offsets[i+1]]
-                # print()
-                # print(et_resource)
                 
                 detection_path_end = et_resource.find(b'\x00\x00\x00')
                 detection_path_end += 3
                 
                 detection_path = et_resource[:detection_path_end].decode('utf-16').rstrip('\x00')
-                # print(f'detection_path: {detection_path}')
+
                 et_resource_dict_1["target_file_path_1"] = detection_path
                 field_count_end = detection_path_end+2
                 field_count = struct.unpack('<H', et_resource[detection_path_end:field_count_end])[0]
-                # print(f'field_count: {field_count}')
                 
                 detection_type_offset = et_resource[field_count_end:].find(b'\x00')
                 detection_type_end = field_count_end + detection_type_offset
                 
-                while et_resource[detection_type_end] == 0: # 뒤에 0 padding 없애기
+                while et_resource[detection_type_end] == 0:
                     detection_type_end += 1
                 
                 detection_type = et_resource[field_count_end:detection_type_end].decode().rstrip('\x00')
-                # print(f'detection_type: {detection_type}')
+
                 et_resource_field = et_resource[detection_type_end:]
-                
-                # print(f'et_resource_field: {et_resource_field}')
                 
                 field_idx = 0
                 for _ in range(field_count):
                     size = struct.unpack("<H", et_resource_field[field_idx:field_idx+2])[0]
                     tmp = struct.unpack("<H", et_resource_field[field_idx+2:field_idx+4])[0]
-                    field_type = tmp >> 12 # 안 씀
+                    field_type = tmp >> 12 
                     field_identifier = tmp & 0x0FFF
-                    # print(f'size: {size}\nfield_type: {field_type}\nfield_identifier: {field_identifier}')
-                    # print(FIELD_IDENTIFIER.get(field_identifier, 'Unknown'))
-                    # print(et_resource_field[field_idx+4:field_idx+4+size])
                     
                     if field_identifier == 2:
-                        et_resource_dict_1['RD_file_name'] = et_resource_field[field_idx+4:field_idx+4+size].hex() # 빅엔디언 hex값으로 출력
+                        et_resource_dict_1['RD_file_name'] = et_resource_field[field_idx+4:field_idx+4+size].hex()
                     elif field_identifier == 0xC:
                         et_resource_dict_1['target_file_path_2'] = et_resource_field[field_idx+4:field_idx+4+size].decode('utf-16').rstrip('\x00')
                     elif field_identifier == 0xF:
@@ -142,14 +118,11 @@ def parsing(path, out_path):
                     field_idx += size + 4
                     et_resource_dict_2[i] = et_resource_dict_1
                 i += 1
-                
 
             et_dict["threat_infomation"] = et_resource_dict_2
-            # print(et_dict)
-            # print(out_path+r"\ET File parsed\\"+file_name+"_parsed.json")
+
             with open(out_path+r"\ET File parsed\\"+file_name+"_parsed.json", 'w') as f3:
                 json.dump(et_dict, f3, indent=4)
-            # print(file_list)
             
             for i in range(et_dict['entry_count']):
                 D_time = et_dict['ditection_time']
@@ -162,26 +135,18 @@ def parsing(path, out_path):
                 int_M_time = mu.convert_time_to_int(M_time)
                 int_C_time = mu.convert_time_to_int(C_time)
                 if int_M_time < int_C_time:
-                    # print("복사 붙여넣기 or 드래그 & 드롭 or 압축")
+                    # print("Copy & Pasts or Drag & Drop or Zip")
                     pass
                 elif int_M_time == int_C_time or (int_M_time - int_C_time) < 1000:
-                    # print("인터넷")
+                    # print("Internet")
                     pass
                 else:
-                    # print('정상 파일에 악성 시그니처 삽입')
+                    # print('Signature Injection')
                     RD_File_path = path + r"\Quarantine\ResourceData" + '\\' + RD_File_name[:2] + '\\' + RD_File_name
-                    # print("RD_File_path", RD_File_path)
+
                     
                     RD_File_size = RD_File.decrypting(RD_File_path, out_path)
                     
-                    # print(D_time)
-                    # print(M_name)
-                    # print(F_path)
-                    # print(M_time)
-                    # print(A_time)
-                    # print(C_time)
-                    # print(RD_File_name)
-                    # print()
                     tmp_E_list = [None] * 16
                     tmp_E_list[2] = F_path[2:]
                     tmp_E_list[3] = RD_File_size
@@ -196,9 +161,6 @@ def parsing(path, out_path):
                     tmp_E_list[14] = RD_File_name
                     E_list.append(tmp_E_list)
             
-
-    # print(E_list)
     return E_list
-    # return out_path+r"\ET File parsed"
     
     

@@ -36,7 +36,6 @@ def parsing_mod_C(f, final_dict):
     elif key_flag == 3:
         final_dict["security_group"] = result
     
-    # print(result)
     return result
 
 def parsing_mod_B(f, length, block_dict):
@@ -49,7 +48,6 @@ def parsing_mod_B(f, length, block_dict):
             break
         key_length = struct.unpack("<I", f.read(4))[0]
         key = f.read(key_length).decode('utf-16').rstrip('\x00')
-        # print(key)
         
         value_length_types = struct.unpack("<I", f.read(4))[0]
         if value_length_types == 0x6:
@@ -68,11 +66,10 @@ def parsing_mod_B(f, length, block_dict):
             
             value = struct.unpack("<"+dynamic_unpack(value_length), f.read(value_length))[0]
 
-        # print(value)
         block_dict[key] = value
         length -= (8 + key_length + value_length)
 
-    return
+    return None
 
 A_counter = count(0)
 def parsing_mod_A(f, rotation_number, final_dict):
@@ -86,10 +83,9 @@ def parsing_mod_A(f, rotation_number, final_dict):
         if length % 8 != 0:
             length += 8 - (length % 8)
         
-        
         if types == 0x15:
             result = f.read(length).decode('utf-16').rstrip('\x00')
-            # print(result)
+
             if 'file' in result or 'beha' in result or 'proc' in result:
                 rotation_number -= 1
                 length = struct.unpack("<I", f.read(4))[0]
@@ -123,12 +119,7 @@ def parsing_mod_A(f, rotation_number, final_dict):
         else:
             result = f.read(length)
             
-        # print(result)
-        
-            
-
     return result
-
 
 def read_skip(f, rotation_number):
     for _ in range(rotation_number):
@@ -156,7 +147,7 @@ def parsing(path, out_path):
             file_path = os.path.join(path+'\\'+sub_folder_name, file_name)
 
             if re.match(guid_pattern, file_name) and os.path.isfile(file_path):
-                # print(file_name)
+
                 file_list.append(file_name)
                 with open(file_path, 'rb') as f:
                     f.read(0x18) 
@@ -171,7 +162,6 @@ def parsing(path, out_path):
                     parsing_mod_A(f, 1, final_dict) 
                     
                     parsing_mod_C(f, final_dict)
-
 
                     read_skip(f, 5) 
 
@@ -239,18 +229,13 @@ def parsing(path, out_path):
                         print(tmp_D_list)
 
                         D_list.append(tmp_D_list)
-
-    # print(out_path)
+                        
     return D_list
 
 
 
 if __name__ == "__main__":
-    path = r"C:\Users\fdno5\Desktop\Malwares\DC2943A4-8C68-4880-AA6D-0513A1B96A7C"
-    path = r"C:\Users\fdno5\Desktop\Malwares 4\8304BF40-293A-40CB-A73B-16395F8927F4"
-    path = r"C:\Users\fdno5\Desktop\Malwares 4\F3483C2F-6000-438E-ABE7-B1088ED36FA1"
-    path = r"C:\Users\fdno5\Desktop\Malwares 4\D3FE516C-B807-4080-92DD-F6C6622D9621_low"
-    parsing(path)
+    pass
     
     
     

@@ -47,7 +47,6 @@ def parsing(path, out_path):
         tmp_N_list[11] = T_det_del + r".000"
         tmp_N_list[12] = 'N'
         N_list.append(tmp_N_list)
-        # print([F_path, T_inject, T_det_del])
         
     cursor.close()
     conn.close()
@@ -57,4 +56,3 @@ def parsing(path, out_path):
         json.dump(N_list, out, indent=4)
 
     return N_list
-    # return output_path
