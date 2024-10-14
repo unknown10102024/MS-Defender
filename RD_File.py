@@ -6,7 +6,6 @@ import os
 
 def decrypting(path, out_path):
     ET_File_name = os.path.basename(path)
-    
     if not os.path.exists(path):
         return 0
     with open(path, 'rb') as f1:

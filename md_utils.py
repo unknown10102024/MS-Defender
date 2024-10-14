@@ -89,19 +89,6 @@ FIELD_IDENTIFIER = {
     0x11:'LastWriteTime'
 }
 
-def arg_parser():
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-o', type=str, help='Output Folder')
-    parser.add_argument('-uj', type=str, help='$UsnJrnl')
-    parser.add_argument('-df', type=str, help='Windows Defender Folder')
-
-    args = parser.parse_args()
-    if args.o == None:
-        print(r"You have to input Output Folder using '-o'")
-        os._exit(0)
-
-    return args
-
 def combine_N_list_E_list(N_list, E_list):
     
     S_list = list()
@@ -224,6 +211,22 @@ def save_S_list_to_csv(S_list, out_path):
     df = pd.DataFrame(S_list, columns=columns)
     
     df.to_csv(f'{out_path}\\S_list.csv', index=False)
+
+def arg_parser():
+    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description='Required arguments for the program')
+    parser.add_argument('-uj', type=str, help='Path to the .db file extracted using [NTFS Log Tracker 1.71]', required=True, metavar='')
+    parser.add_argument('-df', type=str, help='Path to the Windows Defender folder(\\ProgramData\\Microsoft\\Windows Defender), already extracted using a tool like [FTK Imager]', required=True, metavar='')
+    parser.add_argument('-o', type=str, help='Path to the folder where results will be saved', required=True, metavar='')
+
+    args = parser.parse_args()
+
+    if not args.o or not args.uj or not args.df:
+        print("Error: All arguments (-o, -uj, -df) are required.")
+        parser.print_help()
+        os._exit(0)
+
+    return args
     
 if __name__ == "__main__":
     pass

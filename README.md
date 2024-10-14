@@ -14,7 +14,7 @@ python main.py -uj \<$UsnJrnl .db file path\> -df \<Defender folder path\> -o \<
 
 
 ### Example
-python C:Tmp\MSDAD\main.py -uj "C:\artifact\parsed_usnjrnl_using_log_tracker.db" -df "C:\artifact\Windows Defender\" -o "C:\artifact\"
+python C:Tmp\MSDAD\main.py -uj "C:\artifact\parsed_usnjrnl_using_log_tracker.db" -df "C:\artifact\Windows Defender\" -o "C:\result folder\"
 
 
 # Test Environment
