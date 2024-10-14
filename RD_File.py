@@ -30,7 +30,7 @@ def decrypting(path, out_path):
     with open(out_path+r"\RD File decrypted\\" + ET_File_name+"_dec.zip", 'wb') as f2:
         f2.write(zip_buffer.getvalue())
 
-    return 1
+    return section2_size
 
 if __name__ == "__main__":
     path = r"C:\Users\fdno5\Desktop\MD\test artifact 1\Windows Defender\Quarantine\ResourceData\D9\D9B76D3FF2A4007AC09FD51D41820E9E49ED4B22"

@@ -3,30 +3,9 @@ import sys
 import struct
 import re
 import json
+import pandas as pd
 from datetime import datetime, timezone
 
-class SuspectedList():
-    def __init__(self) -> None:
-        self.Who = None
-        self.What_file = None
-        self.What_sig = None
-        self.When_inject = None
-        self.How_inject = None
-        self.When_det_del = None
-        
-        self.N_com = None
-        self.N_user = None
-        self.F_path = None
-        self.F_size = None
-        self.N_enc = None
-        self.N_mal = None
-        self.T_mac = None
-        self.T_inject = None
-        self.N_proc = None
-        self.T_det_del = None
-        
-        self.list_flag = None
-        self.file_path = None
 
 WINDOWS_TICKS_TO_UNIX_EPOCH = 116444736000000000
 TICKS_PER_SECOND = 10000000
@@ -38,7 +17,11 @@ def convert_time_to_int(str_time):
     return int_time
 
 def convert_filetime_to_datetime(byte_data):
-    filetime = struct.unpack('<Q', byte_data)[0]
+    if isinstance(byte_data, int):
+        filetime = byte_data
+    else:
+        filetime = struct.unpack('<Q', byte_data)[0]
+    
     unix_timestamp = (filetime - WINDOWS_TICKS_TO_UNIX_EPOCH) / TICKS_PER_SECOND
     dt = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
     return dt.strftime('%Y-%m-%d %H:%M:%S.') + f"{int(dt.microsecond / 1000):03d}"
@@ -349,14 +332,129 @@ def arg_parser():
     return args
 
 
+def combine_N_list_E_list(N_list, E_list):
+    
+    S_list = list()
+    N_list_len = len(N_list)
+    E_list_len = len(E_list)
+    N_idx = 0
+    while N_idx < N_list_len:
+        E_idx = 0
+        while E_idx < E_list_len:
+            if N_list[N_idx][2] == E_list[E_idx][2]: # compare F_path
+                T_inject = convert_time_to_int(N_list[N_idx][9]) # T_inject
+                M_Time = convert_time_to_int(E_list[E_idx][6]) # M_Time
+                if abs(M_Time - T_inject) < 60000: # 1 minute 
+                    tmp_S_list = [None] * 16
+                    tmp_S_list[0] = None
+                    tmp_S_list[1] = None
+                    tmp_S_list[2] = E_list[E_idx][2]
+                    tmp_S_list[3] = E_list[E_idx][3]
+                    tmp_S_list[4] = E_list[E_idx][4]
+                    tmp_S_list[5] = E_list[E_idx][5]
+                    tmp_S_list[6] = E_list[E_idx][6]
+                    tmp_S_list[7] = E_list[E_idx][7]
+                    tmp_S_list[8] = E_list[E_idx][8]
+                    tmp_S_list[9] = N_list[N_idx][9]
+                    tmp_S_list[10] = None
+                    tmp_S_list[11] = E_list[E_idx][11]
+                    tmp_S_list[12] = "NE"
+                    tmp_S_list[13] = E_list[E_idx][13]
+                    tmp_S_list[14] = E_list[E_idx][14]
+                    S_list.append(tmp_S_list)
+                    
+                    del N_list[N_idx]
+                    del E_list[E_idx]
+                    
+                    N_list_len -= 1
+                    E_list_len -= 1
+                    N_idx -= 1
+                    
+                    break
+                    
+            E_idx += 1
+            
+        N_idx += 1
+    
+    S_list.extend(N_list)
+    S_list.extend(E_list)
+    
+    return S_list
 
+def combine_S_list_D_list(T_list, D_list):
+    S_list = list()
+    T_list_len = len(T_list)
+    D_list_len = len(D_list)
+    T_idx = 0
+    while T_idx < T_list_len:
+        D_idx = 0
+        while D_idx < D_list_len:
+            if ("E" in T_list[T_idx][12] and T_list[T_idx][13] == D_list[D_idx][13]):
+                # tmp_S_list = [None] * 16
+                T_list[T_idx][0] = D_list[D_idx][0]
+                T_list[T_idx][1] = D_list[D_idx][1]
+                T_list[T_idx][10] = D_list[D_idx][10]
+                T_list[T_idx][12] += D_list[D_idx][12]
+                T_list[T_idx][15] = D_list[D_idx][15]
+                S_list.append(T_list[T_idx])
+                
+                del T_list[T_idx]
+                del D_list[D_idx]
+                
+                T_list_len -= 1
+                D_list_len -= 1
+                T_idx -= 1
+                break
+            D_idx += 1
+        T_idx += 1
+        
+    T_list_len = len(T_list)
+    D_list_len = len(D_list)
+    T_idx = 0
+    while T_idx < T_list_len:
+        D_idx = 0
+        while D_idx < D_list_len:
+            T_T_det_del = convert_time_to_int(T_list[T_idx][11])
+            D_T_det_del = convert_time_to_int(convert_filetime_to_datetime(D_list[D_idx][11]))
+            tmp_flag = ("E" not in T_list[T_idx][12] and T_list[T_idx][2] == D_list[D_idx][2] and abs(D_T_det_del - T_T_det_del) < 180000)
+            if tmp_flag:
+                # tmp_S_list = [None] * 16
+                T_list[T_idx][0] = D_list[D_idx][0]
+                T_list[T_idx][1] = D_list[D_idx][1]
+                T_list[T_idx][10] = D_list[D_idx][10]
+                T_list[T_idx][12] += D_list[D_idx][12]
+                T_list[T_idx][15] = D_list[D_idx][15]
+                S_list.append(T_list[T_idx])
+                
+                del T_list[T_idx]
+                del D_list[D_idx]
+                
+                T_list_len -= 1
+                D_list_len -= 1
+                T_idx -= 1
+                
+                break
 
+            D_idx += 1
+        T_idx += 1
+    
+    S_list.extend(T_list)
+    
+    return S_list
 
-
-
-
-
-
+def save_S_list_to_csv(S_list, out_path):
+    columns = pd.MultiIndex.from_tuples([('Who', 'N_com'), ('Who', 'N_user'), 
+                                         ('What_file', 'F_path'), ('What_file', 'F_size'), ('What_file', 'F_enc'), 
+                                         ('What_sig', 'N_mal'), 
+                                         ('When_inject', 'M_time'), ('When_inject', 'A_time'), ('When_inject', 'C_time'), ('When_inject', 'T_inject'), 
+                                         ('How_inject', 'N_proc'), 
+                                         ('When_det_del', 'T_det_del'), 
+                                         ('Used_artifacts', 'flag'), ('Used_artifacts', 'N_ET_File'), ('Used_artifacts', 'N_RD_File'), ('Used_artifacts', 'N_DH_File')
+                                         ])
+    df = pd.DataFrame(S_list, columns=columns)
+    print(df)
+    df.to_csv(f'{out_path}\\S_list.csv', index=False)
+    
 
 
 

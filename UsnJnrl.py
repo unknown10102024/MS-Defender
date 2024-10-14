@@ -37,7 +37,7 @@ def parsing(path, out_path):
 
     N_list = list()
     for row4 in list_suspected:
-        tmp_N_list = [None, None, None, None, None, None, None, None, None, None, None, None, None]
+        tmp_N_list = [None] * 16
         
         F_path = row4[3]
         T_inject = row4[-1]

@@ -1,4 +1,3 @@
-
 import md_utils as mu
 import RD_File
 import struct
@@ -173,9 +172,8 @@ def parsing(path, out_path):
                     RD_File_path = path + r"\Quarantine\ResourceData" + '\\' + RD_File_name[:2] + '\\' + RD_File_name
                     # print("RD_File_path", RD_File_path)
                     
-                    RD_exists_flag = RD_File.decrypting(RD_File_path, out_path)
-                    if RD_exists_flag:
-                        pass
+                    RD_File_size = RD_File.decrypting(RD_File_path, out_path)
+                    
                     # print(D_time)
                     # print(M_name)
                     # print(F_path)
@@ -184,15 +182,18 @@ def parsing(path, out_path):
                     # print(C_time)
                     # print(RD_File_name)
                     # print()
-                    tmp_E_list = [None, None, None, None, None, None, None, None, None, None, None, None, None]
+                    tmp_E_list = [None] * 16
                     tmp_E_list[2] = F_path[2:]
-                    tmp_E_list[4] = RD_File_name
+                    tmp_E_list[3] = RD_File_size
+                    tmp_E_list[4] = 'O' if RD_File_size else None
                     tmp_E_list[5] = M_name
                     tmp_E_list[6] = M_time
                     tmp_E_list[7] = A_time
                     tmp_E_list[8] = C_time
                     tmp_E_list[11] = D_time
                     tmp_E_list[12] = 'E'
+                    tmp_E_list[13] = file_name
+                    tmp_E_list[14] = RD_File_name
                     E_list.append(tmp_E_list)
             
 

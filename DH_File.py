@@ -118,7 +118,7 @@ def parsing_mod_A(f, rotation_number, final_dict):
             result += hex(struct.unpack(">H", f.read(2))[0])[2:].upper().zfill(4) + '-'
             result += hex(struct.unpack(">H", f.read(2))[0])[2:].upper().zfill(4)
             result += hex(struct.unpack(">I", f.read(4))[0])[2:].upper().zfill(8)
-            final_dict["ET_file_name"] = result
+            final_dict["ET_file_name"] = '{' + result + '}'
             
         else:
             result = f.read(length)
@@ -148,6 +148,7 @@ def parsing(path, out_path):
     guid_pattern = r"[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}"
     sub_folder_pattern = r"[A-F0-9]{2}"
     
+    D_list = list()
     for sub_folder_name in os.listdir(path):
         if not (re.match(sub_folder_pattern, sub_folder_name) and os.path.isdir(path+'\\'+sub_folder_name)):
             continue
@@ -170,29 +171,29 @@ def parsing(path, out_path):
                     parsing_mod_A(f, 1, final_dict) 
                     
                     parsing_mod_C(f, final_dict)
-                    
-                    
+
+
                     read_skip(f, 5) 
-                    
+
                     parsing_mod_A(f, 1, final_dict)
-                    
+
                     read_skip(f, 4)
-                    
+
                     info_num = parsing_mod_A(f, 1, final_dict) 
-                    
+
                     chunk_dict = dict()
-                    
+
                     idx = 0
                     while True:
                         if idx >= info_num:
                             break
-                        
+
                         block_dict = dict()
 
                         parsing_mod_A(f, 1, block_dict)
-                        
+
                         parsing_mod_A(f, 2, block_dict) 
-                        
+
                         read_skip(f, 2) 
 
                         parsing_mod_A(f, 1, block_dict)
@@ -218,11 +219,29 @@ def parsing(path, out_path):
                     read_skip(f, 9)
 
                     parsing_mod_C(f, final_dict)
-                    
+
                     with open(f"{out_path}\\{file_name}.json", 'w') as out:
                         json.dump(final_dict, out, indent=4)
+
+                    for i in range(final_dict["information_number"]):
+                        tmp_D_list = [None] * 16
+                        user = final_dict["user"].split("\\")
+                        tmp_D_list[0] = user[0]
+                        tmp_D_list[1] = user[1]
+                        tmp_D_list[2] = final_dict["threat_infomation"][i]["original_file_path"][2:]
+                        tmp_D_list[3] = final_dict["threat_infomation"][i]["ThreatTrackingSize"]
+                        tmp_D_list[5] = final_dict["malware_name"]
+                        tmp_D_list[10] = final_dict["spawning_process_name"][2:]
+                        tmp_D_list[11] = final_dict["threat_infomation"][i]["ThreatTrackingStartTime"]
+                        tmp_D_list[12] = "D"
+                        tmp_D_list[13] = final_dict["ET_file_name"]
+                        tmp_D_list[15] = final_dict["DH_file_name"]
+                        print(tmp_D_list)
+
+                        D_list.append(tmp_D_list)
+
     # print(out_path)
-    return out_path
+    return D_list
 
 
 
