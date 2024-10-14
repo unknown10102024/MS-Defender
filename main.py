@@ -12,9 +12,14 @@ def main():
     
     T_list = mu.combine_N_list_E_list(N_list=N_list, E_list=E_list)
     S_list = mu.combine_S_list_D_list(T_list=T_list, D_list=D_list)
-
-    mu.save_S_list_to_csv(S_list, args.o)
-
+    
+    if len(S_list) == 0:
+        print("Failure: No evidence of Defender abuse found.")
+    else:
+        mu.save_S_list_to_csv(S_list, args.o)
+        print("Success: Evidence of Defender abuse found.")
+    
 if __name__ == "__main__":
     main()
+    
 

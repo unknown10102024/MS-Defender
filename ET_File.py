@@ -58,7 +58,6 @@ def parsing(path, out_path):
             
             et_dict["section_1_crc"] = struct.unpack('<I', section_1_crc)[0]
             et_dict["section_2_crc"] = struct.unpack('<I', section_2_crc)[0]
-            print(timestamp.hex())
             et_dict["ditection_time"] = mu.convert_filetime_to_datetime(timestamp)
             et_dict["malware_name"] = detection_name
             et_dict["entry_count"] = entry_count

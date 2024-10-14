@@ -14,7 +14,7 @@ python main.py -uj \<$UsnJrnl .db file path\> -df \<Defender folder path\> -o \<
 
 
 ### Example
-python C:Tmp\MSDAD\main.py -uj "C:\artifact\parsed_usnjrnl_using_log_tracker.db" -df "C:\artifact\Windows Defender\" -o "C:\result folder\"
+python C:\Tmp\MSDAD\main.py -uj "C:\Tmp\artifact\parsed_usnjrnl_using_log_tracker.db" -df "C:\Tmp\artifact\Windows Defender\" -o "C:\result folder\"
 
 
 # Test Environment
@@ -25,3 +25,4 @@ Both the VM image and the Windows password are set to "defender".
 The VM contains pre-extracted artifacts needed for the tool’s use, stored in the "artifact" folder. Additionally, it includes tools such as a PowerShell script designed to inject malicious signatures to verify completely removed file deletions via Defender, as well as FTK, HxD, and others.
 
 [Download link](https://drive.google.com/file/d/1gguPEA48V552HW5HNlvHHQ0ztBsXWCgH/view?usp=sharing)
+

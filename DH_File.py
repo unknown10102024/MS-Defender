@@ -157,7 +157,7 @@ def parsing(path, out_path):
                     GUID += hex(struct.unpack(">H", f.read(2))[0])[2:].upper().zfill(4) + '-'
                     GUID += hex(struct.unpack(">H", f.read(2))[0])[2:].upper().zfill(4)
                     GUID += hex(struct.unpack(">I", f.read(4))[0])[2:].upper().zfill(8)
-                    # print(GUID)
+
                     final_dict["DH_file_name"] = GUID
                     parsing_mod_A(f, 1, final_dict) 
                     
@@ -226,7 +226,6 @@ def parsing(path, out_path):
                         tmp_D_list[12] = "D"
                         tmp_D_list[13] = final_dict["ET_file_name"]
                         tmp_D_list[15] = final_dict["DH_file_name"]
-                        print(tmp_D_list)
 
                         D_list.append(tmp_D_list)
                         

@@ -55,7 +55,6 @@ class RC4Variant:
         for i in range(256):
             j = (j + self.S[i] + key[i]) % 256
             self.S[i], self.S[j] = self.S[j], self.S[i]
-        # print(self.S)
         self.i = 0
         self.j = 0
 
@@ -209,6 +208,9 @@ def save_S_list_to_csv(S_list, out_path):
                                          ('Used_artifacts', 'flag'), ('Used_artifacts', 'N_ET_File'), ('Used_artifacts', 'N_RD_File'), ('Used_artifacts', 'N_DH_File')
                                          ])
     df = pd.DataFrame(S_list, columns=columns)
+    
+    print(df)
+    print()
     
     df.to_csv(f'{out_path}\\S_list.csv', index=False)
 
