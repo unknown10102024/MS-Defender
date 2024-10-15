@@ -43,7 +43,7 @@ python C:\Tmp\MSDAD\main.py -uj "C:\Tmp\artifact\parsed_usnjrnl_using_log_tracke
     - C_time:    Created time of the target file
     - T_inject:  Signature injection timestamp
   - How_inject
-    - N_proc:    Last process executed the target file
+    - N_proc: The last process executed the target file
   - When_det_del
     - T_det_del: Timestamp of the target file was detected and deleted
   - Used_artifacts
@@ -54,14 +54,15 @@ python C:\Tmp\MSDAD\main.py -uj "C:\Tmp\artifact\parsed_usnjrnl_using_log_tracke
 
 ### Caution
 When extracting the .db file from the $UsnJrnl using NTFS Log Tracker, ensure that the section highlighted in red is set to UTC-0, as shown in the image below.
+
 ![NTFS Log Tracker](https://github.com/user-attachments/assets/dfebe4a0-0e90-4b61-a5d8-676687a80bbd)
 
 
 # Test Environment
-The tool can be used on your own computer, but a ready-to-use VM image is also available for testing.
+The tool can be used on your computer, but a ready-to-use VM image is also available for testing.
 
-Both the VM image and the Windows password are set to "defender".
+The VM image and the Windows password are set to "defender".
 
-The VM contains pre-extracted artifacts needed for the tool’s use, stored in the "artifact" folder. Additionally, it includes tools such as a PowerShell script designed to inject malicious signatures to verify completely removed file deletions via Defender, as well as FTK, HxD, and others.
+The VM contains pre-extracted artifacts needed for the tool’s use, stored in the "artifact" folder. Additionally, it includes tools such as a PowerShell script designed to inject malicious signatures to verify completely removed file deletions via Defender, FTK, HxD, and others.
 
 [Download link](https://drive.google.com/file/d/1gguPEA48V552HW5HNlvHHQ0ztBsXWCgH/view?usp=sharing)
